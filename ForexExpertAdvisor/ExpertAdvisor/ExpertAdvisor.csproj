@@ -42,22 +42,27 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="TA-Lib-Core, Version=1.0.4998.21369, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\TA-Lib.0.5.0.3\lib\TA-Lib-Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Advisor\AdvisorFactory.cs" />
+    <Compile Include="Advisor\ExpertAdvisor.cs" />
+    <Compile Include="Advisor\ScalperAdvisor.cs" />
     <Compile Include="ExpertAdvisor.cs" />
     <Compile Include="Indicator\Ichimoku.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TrendIndicator\BollingerBands.cs" />
+    <Compile Include="TrendIndicator\CandleStick.cs" />
     <Compile Include="TrendIndicator\MACD.cs" />
     <Compile Include="TrendIndicator\OrderAction.cs" />
     <Compile Include="TrendIndicator\ParabolicSar.cs" />
     <Compile Include="TrendIndicator\TrendDirection.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ExpertIndicator\ExpertIndicator.csproj">
-      <Project>{bdd038c7-2d93-440d-ad70-65c00ec5dab1}</Project>
-      <Name>ExpertIndicator</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

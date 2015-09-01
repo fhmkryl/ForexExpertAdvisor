@@ -1,5 +1,5 @@
 ﻿using NQuotes;
-using TicTacTec.TA.Library.Core;
+using TicTacTec.TA.Library;
 
 namespace ExpertAdvisor.TrendIndicator
 {
@@ -29,8 +29,6 @@ namespace ExpertAdvisor.TrendIndicator
             _period = period;
             _trendDirectionCandleCount = trendDirectionCandleCount;
             _marginPoints = marginPoints;
-
-            Core.RetCode 
         }
 
         public TrendDirection GetTrendDirection()
