@@ -66,7 +66,25 @@ namespace ExpertAdvisor.TrendIndicator
                         _mqlApi.ObjectSetString(chartId, "label_object", MqlApi.OBJ_TEXT, MqlApi.OBJPROP_TEXT, string.Format("Simple Label {0}", i));
                     }
                 }
-                
+
+                int counted_bars = _mqlApi.IndicatorCounted();
+                int shift;
+                int limit = _mqlApi.Bars;
+                int Window = 0;
+                int ScaleVertLineUp = 5, ScaleVertLineDown = 5;
+                int InputOBJPROP_STYLE = 0;
+                string VertLineUp  = "VertLineUp";
+                string VertLineDown  = "VertLineDown";
+                Color ColourUp = Color.Blue, ColourDown = Color.Orange;
+
+                // if(counted_bars < LOOKBACK) counted_bars = LOOKBACK; // SMA(x) has look back of x
+                var barCount = _mqlApi.Bars;
+                for (int i = 0; i < barCount; i++)
+                {
+                    var time = _mqlApi.Time[i];
+                    var lowPrice = _mqlApi.Low[i];
+                    _mqlApi.ObjectCreate("Arrow", MqlApi.OBJ_ARROW, 0, time, lowPrice);
+                }
             }
             catch (Exception exception)
             {

@@ -9,14 +9,14 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ExpertAdvisor</RootNamespace>
     <AssemblyName>ExpertAdvisor</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\..\..\..\..\..\Program Files %28x86%29\MetaTrader 4\MQL4\Experts\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MathNet.Numerics, Version=3.8.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MathNet.Numerics.3.8.0\lib\net40\MathNet.Numerics.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="nquotes, Version=1.13.0.0, Culture=neutral, PublicKeyToken=10a0b99e254e1a7d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Debug\nquotes.dll</HintPath>
@@ -37,6 +41,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Numerics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -48,21 +53,45 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Advisor\AdvisorFactory.cs" />
-    <Compile Include="Advisor\ExpertAdvisor.cs" />
-    <Compile Include="Advisor\ScalperAdvisor.cs" />
+    <Compile Include="CandleStick\BearishEngulfing.cs" />
+    <Compile Include="CandleStick\BullishEngulfing.cs" />
+    <Compile Include="CandleStick\CandleStickHelper.cs" />
+    <Compile Include="CandleStick\EveningDojiStar.cs" />
+    <Compile Include="CandleStick\EveningStar.cs" />
+    <Compile Include="CandleStick\MorningDojiStar.cs" />
+    <Compile Include="CandleStick\MorningStar.cs" />
+    <Compile Include="Entity\Bar.cs" />
+    <Compile Include="Entity\CloseOrderRequest.cs" />
+    <Compile Include="Entity\CloseOrderResponse.cs" />
+    <Compile Include="Entity\Enums.cs" />
+    <Compile Include="Entity\IndicatorResult.cs" />
+    <Compile Include="Entity\LastTickBar.cs" />
+    <Compile Include="Entity\OhlcvData.cs" />
+    <Compile Include="Entity\OpenOrderRequest.cs" />
+    <Compile Include="Entity\OpenOrderResponse.cs" />
+    <Compile Include="Entity\Order.cs" />
+    <Compile Include="Entity\OrderType.cs" />
+    <Compile Include="Entity\TickData.cs" />
+    <Compile Include="Entity\TrailOrderRequest.cs" />
+    <Compile Include="Entity\TrailOrderResponse.cs" />
     <Compile Include="ExpertAdvisor.cs" />
     <Compile Include="Indicator\Ichimoku.cs" />
+    <Compile Include="Indicator\MovingAverageCrossoverIndicator.cs" />
+    <Compile Include="Indicator\SarIndicator.cs" />
+    <Compile Include="Indicator\StochasticIndicator.cs" />
+    <Compile Include="OrderManagement\OrderManager.cs" />
+    <Compile Include="OrderManagement\TrendOrderManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TrendIndicator\BollingerBands.cs" />
-    <Compile Include="TrendIndicator\CandleStick.cs" />
-    <Compile Include="TrendIndicator\MACD.cs" />
-    <Compile Include="TrendIndicator\OrderAction.cs" />
-    <Compile Include="TrendIndicator\ParabolicSar.cs" />
-    <Compile Include="TrendIndicator\TrendDirection.cs" />
+    <Compile Include="Indicator\EmaIndicator.cs" />
+    <Compile Include="Strategies\SarMacd.cs" />
+    <Compile Include="Strategies\Stochastic.cs" />
+    <Compile Include="Strategies\TrenderStrategy.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="TrendIndicator\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -2,6 +2,11 @@
 using System.Drawing;
 using ExpertAdvisor.TrendIndicator;
 using NQuotes;
+using System.Collections.Generic;
+using ExpertAdvisor.Entity;
+using System.Linq;
+using System.Text;
+using System.IO;
 
 namespace ExpertAdvisor.Advisor
 {
@@ -34,14 +39,17 @@ namespace ExpertAdvisor.Advisor
 
             // Get order action
             OrderAction orderAction = GetOrderAction(symbol);
-            _mqlApi.Print(string.Format("Action : {0} , TakeProfit : {1} , StopLoss : {2}", orderAction.OrderActionType,
-                orderAction.TakeProfit, orderAction.StopLoss));
-
-            // Do order operations
-            if (orderAction.OrderActionType != OrderActionType.NONE)
+            if (orderAction != null)
             {
-                const double volume = 1.0;
-                ExecuteOrder(symbol, volume, orderAction);
+                _mqlApi.Print(string.Format("Action : {0} , TakeProfit : {1} , StopLoss : {2}", orderAction.OrderActionType,
+                    orderAction.TakeProfit, orderAction.StopLoss));
+
+                // Do order operations
+                if (orderAction.OrderActionType != OrderActionType.NONE)
+                {
+                    const double volume = 0.1;
+                    ExecuteOrder(symbol, volume, orderAction);
+                }
             }
 
             // Modify orders
@@ -50,26 +58,99 @@ namespace ExpertAdvisor.Advisor
 
         public OrderAction GetOrderAction(string symbol)
         {
-            // Check bollinger trend direction
-            BollingerBands bollingersIndicator = new BollingerBands(_mqlApi, symbol, _timeFrame, _bollingersPeriod, _bollingersTrendDirectionCandleCount, _bollingersMarginPoints);
-            TrendDirection bollingersTrendDirection = bollingersIndicator.GetTrendDirection(); 
+            StringBuilder resultBuilder = new StringBuilder();
+            var timeFrame = MqlApi.PERIOD_M1;
 
-            // Check candle sticks trend direction
-            CandleStick candleStickIndicator = new CandleStick(_mqlApi, symbol, _timeFrame, _candleStickPeriod, _candleStickCandleCount);
-            TrendDirection candleStickTrendDirection = candleStickIndicator.GetTrendDirection();
+            var recentBars = GetRecentBars(symbol, timeFrame);
+            var lastBar = recentBars.OrderByDescending(p => p.Time).First();
+            var lastTickBar = LastTickBar.lastTickBars.OrderBy(p => p.Time).FirstOrDefault();
+            
+            // Yeni bar açıldı!
+            // Todo: Diğer timeframeler için de burası değiştirilmeli
+            if (lastTickBar != null)
+            {
+                if (lastBar.Time.Minute - lastTickBar.Time.Minute  == 5)
+                {
+                    _mqlApi.Print("Clearing last bars...");
+                    LastTickBar.lastTickBars = new List<Bar>();
+                }
+            }
+            LastTickBar.lastTickBars.Add(lastBar);
 
-            // Todo: Choose one of them
-            TrendDirection trendDirectionResult = TrendDirection.NONE;
+            if (LastTickBar.lastTickBars.Count > 3)
+            {
+                var currentTickbarIndex = LastTickBar.lastTickBars.Count - 1;
+                var currentTickBar1 = LastTickBar.lastTickBars[currentTickbarIndex];
 
-            // Check bollinger order action
-            OrderAction bollingersOrderAction = bollingersIndicator.GetOrderAction(trendDirectionResult);
+                var currentTickBarDirection1 = GetCurrentTickBarActionType(currentTickBar1, currentTickbarIndex, LastTickBar.lastTickBars);
 
-            // Check candle stick order action
-            OrderAction candleStickOrderAction = candleStickIndicator.GetOrderAction(trendDirectionResult);
+                if (currentTickBarDirection1 == OrderActionType.BUY)
+                {
+                    return new OrderAction
+                    {
+                        OrderActionType = OrderActionType.BUY
+                    };
+                }
+                if (currentTickBarDirection1 == OrderActionType.SELL)
+                {
+                    return new OrderAction
+                    {
+                        OrderActionType = OrderActionType.SELL
+                    };
+                }
+            }
+            
+            return new OrderAction
+            {
+                OrderActionType = OrderActionType.NONE
+            };
+        }
 
-            // Todo: Choose one of them
+        private OrderActionType GetCurrentTickBarActionType(Bar currentTickBar, int currentTickBarIndex, List<Bar> list)
+        {
+            if (currentTickBar.Open > list[currentTickBarIndex - 1].Open
+                && currentTickBar.Open > list[currentTickBarIndex - 2].Open
+                && currentTickBar.Open > list[currentTickBarIndex - 3].Open)
+            {
+                return OrderActionType.BUY;
+            }
+            if (currentTickBar.Open < list[currentTickBarIndex - 1].Open
+                && currentTickBar.Open < list[currentTickBarIndex - 2].Open
+                && currentTickBar.Open < list[currentTickBarIndex - 3].Open)
+            {
+                return OrderActionType.SELL;
+            }
 
-            return null;
+            return OrderActionType.NONE;
+        }
+
+        private List<Bar> GetRecentBars(string symbol,int timeFrame)
+        {
+            List<Bar> bars = new List<Bar>();
+            for (int i = 1; i <= _mqlApi.iBars(symbol, timeFrame); i++)
+            {
+                var open = _mqlApi.iOpen(symbol, timeFrame, i);
+                var high = _mqlApi.iHigh(symbol, timeFrame, i);
+                var low = _mqlApi.iLow(symbol, timeFrame, i);
+                var close = _mqlApi.iClose(symbol, timeFrame, i);
+                var volume = _mqlApi.iVolume(symbol, timeFrame, i);
+                var time = _mqlApi.iTime(symbol, timeFrame, i);
+
+                var bar = new Bar
+                {
+                    Symbol = symbol,
+                    Open = open,
+                    High = high,
+                    Low = low,
+                    Close = close,
+                    Volume = volume,
+                    Time = time
+                };
+
+                bars.Add(bar);
+            }
+
+            return bars;
         }
 
         private void ExecuteOrder(string symbol, double volume, OrderAction orderAction)
